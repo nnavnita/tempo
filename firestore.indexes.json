@@ -1,0 +1,31 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "events",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "ownerUid", "order": "ASCENDING" },
+        { "fieldPath": "startTime", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "events",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "ownerUid", "order": "ASCENDING" },
+        { "fieldPath": "visibility", "order": "ASCENDING" },
+        { "fieldPath": "startTime", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "events",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "ownerUid", "order": "ASCENDING" },
+        { "fieldPath": "startTime", "order": "ASCENDING" },
+        { "fieldPath": "visibility", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

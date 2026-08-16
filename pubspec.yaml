@@ -1,0 +1,66 @@
+name: tempo
+description: Social calendar and smart task scheduler
+version: 1.0.0+1
+publish_to: 'none'
+
+environment:
+  sdk: ^3.10.7
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Firebase
+  firebase_core: ^3.3.0
+  firebase_auth: ^5.1.0
+  cloud_firestore: ^5.2.0
+  firebase_messaging: ^15.0.0
+
+  # Google Sign-In + Calendar
+  google_sign_in: ^6.2.1
+  googleapis: ^13.2.0
+  googleapis_auth: ^1.6.0
+  extension_google_sign_in_as_googleapis_auth: ^2.0.12
+
+  # State Management
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+
+  # Navigation
+  go_router: ^14.2.7
+
+  # Calendar UI
+  table_calendar: ^3.1.2
+
+  # Storage
+  flutter_secure_storage: ^9.2.2
+  shared_preferences: ^2.3.1
+
+  # HTTP
+  http: ^1.2.1
+
+  # Utilities
+  uuid: ^4.4.0
+
+  # UI Utilities
+  cached_network_image: ^3.3.1
+  intl: ^0.19.0
+  gap: ^3.0.1
+  flutter_local_notifications: ^17.2.2
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.11
+  riverpod_generator: ^2.4.3
+  json_serializable: ^6.8.0
+  freezed: ^2.5.2
+  freezed_annotation: ^2.4.4
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
