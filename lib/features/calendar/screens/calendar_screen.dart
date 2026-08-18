@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
-import '../../../core/constants/route_constants.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/notification_bell_action.dart';
 import '../../../models/event_model.dart';
 import '../../../providers/events_provider.dart';
 import '../widgets/event_marker.dart';
@@ -56,6 +56,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             tooltip: 'Jump to month',
             onPressed: _showMonthYearPicker,
           ),
+          const NotificationBellAction(),
         ],
       ),
       body: Column(
@@ -219,10 +220,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                   ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push(RouteConstants.createEvent),
-        child: const Icon(Icons.add),
       ),
     );
   }

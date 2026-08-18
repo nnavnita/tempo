@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/route_constants.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/notification_bell_action.dart';
 import '../../../providers/friends_provider.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../config/providers/firebase_providers.dart';
@@ -28,6 +29,7 @@ class FriendsListScreen extends ConsumerWidget {
             icon: const Icon(Icons.inbox_outlined),
             onPressed: () => context.push(RouteConstants.friendRequests),
           ),
+          const NotificationBellAction(),
         ],
       ),
       body: friendshipsAsync.when(

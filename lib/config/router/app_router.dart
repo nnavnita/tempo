@@ -14,6 +14,7 @@ import '../../features/friends/screens/user_search_screen.dart';
 import '../../features/notifications/screens/notifications_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
 import '../../providers/auth_provider.dart';
+import 'main_nav_bar.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   // Listen to auth state for redirect
@@ -115,8 +116,7 @@ class _MainShell extends StatelessWidget {
   int _currentIndex(String location) {
     if (location.startsWith('/friends')) return 2;
     if (location.startsWith('/feed')) return 1;
-    if (location.startsWith('/notifications')) return 3;
-    if (location.startsWith('/profile')) return 4;
+    if (location.startsWith('/profile')) return 3;
     return 0;
   }
 
@@ -125,54 +125,21 @@ class _MainShell extends StatelessWidget {
     final location = state.matchedLocation;
     return Scaffold(
       body: child,
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          border: Border(top: BorderSide(color: Color(0xFFF0F0F0))),
-        ),
-        child: NavigationBar(
-          selectedIndex: _currentIndex(location),
-          onDestinationSelected: (i) {
-            switch (i) {
-              case 0:
-                context.go(RouteConstants.calendar);
-              case 1:
-                context.go(RouteConstants.feed);
-              case 2:
-                context.go(RouteConstants.friends);
-              case 3:
-                context.go(RouteConstants.notifications);
-              case 4:
-                context.go(RouteConstants.profile);
-            }
-          },
-          destinations: const [
-            NavigationDestination(
-              icon: Icon(Icons.calendar_month_outlined),
-              selectedIcon: Icon(Icons.calendar_month),
-              label: 'Calendar',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.explore_outlined),
-              selectedIcon: Icon(Icons.explore),
-              label: 'Feed',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.people_outline),
-              selectedIcon: Icon(Icons.people),
-              label: 'Friends',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.notifications_outlined),
-              selectedIcon: Icon(Icons.notifications),
-              label: 'Alerts',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.person_outline),
-              selectedIcon: Icon(Icons.person),
-              label: 'Profile',
-            ),
-          ],
-        ),
+      bottomNavigationBar: MainNavBar(
+        selectedIndex: _currentIndex(location),
+        onDestinationSelected: (i) {
+          switch (i) {
+            case 0:
+              context.go(RouteConstants.calendar);
+            case 1:
+              context.go(RouteConstants.feed);
+            case 2:
+              context.go(RouteConstants.friends);
+            case 3:
+              context.go(RouteConstants.profile);
+          }
+        },
+        onCreatePressed: () => context.push(RouteConstants.createEvent),
       ),
     );
   }

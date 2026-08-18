@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/providers/firebase_providers.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/notification_bell_action.dart';
 import '../../../models/event_model.dart';
 import '../../../providers/friends_provider.dart';
 import '../../events/widgets/event_card.dart';
@@ -16,7 +17,10 @@ class FriendsFeedScreen extends ConsumerWidget {
     final feedAsync = ref.watch(_feedProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Feed')),
+      appBar: AppBar(
+        title: const Text('Feed'),
+        actions: const [NotificationBellAction()],
+      ),
       body: feedAsync.when(
         data: (events) {
           if (events.isEmpty) {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../config/providers/firebase_providers.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/notification_bell_action.dart';
 import '../../../providers/user_provider.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -13,7 +14,10 @@ class ProfileScreen extends ConsumerWidget {
     final userAsync = ref.watch(currentUserProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: AppBar(
+        title: const Text('Profile'),
+        actions: const [NotificationBellAction()],
+      ),
       body: userAsync.when(
         data: (user) {
           if (user == null) return const Center(child: Text('Not signed in'));
