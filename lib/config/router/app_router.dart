@@ -66,10 +66,6 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
           GoRoute(
-            path: RouteConstants.notifications,
-            builder: (context, state) => const NotificationsScreen(),
-          ),
-          GoRoute(
             path: RouteConstants.profile,
             builder: (context, state) => const ProfileScreen(),
           ),
@@ -78,6 +74,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouteConstants.createEvent,
         builder: (context, state) => const CreateEventScreen(),
+      ),
+      GoRoute(
+        path: RouteConstants.notifications,
+        builder: (context, state) => const NotificationsScreen(),
       ),
       GoRoute(
         path: '/event/:eventId',
