@@ -28,10 +28,6 @@ void main() {
           ?.resolve(<WidgetState>{}), AppColors.dark.primary);
     });
 
-    test('navigation bar uses dark surface and dark primary indicator', () {
-      expect(theme.navigationBarTheme.backgroundColor, AppColors.dark.surface);
-    });
-
     test('floating action button uses dark primary', () {
       expect(theme.floatingActionButtonTheme.backgroundColor,
           AppColors.dark.primary);

@@ -74,28 +74,6 @@ class AppTheme {
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         labelStyle: const TextStyle(color: AppColors.onSurfaceVariant),
       ),
-      navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: AppColors.surface,
-        elevation: 0,
-        shadowColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        indicatorColor: AppColors.primary.withOpacity(0.12),
-        labelTextStyle: WidgetStateProperty.resolveWith((states) {
-          final active = states.contains(WidgetState.selected);
-          return TextStyle(
-            fontSize: 11,
-            fontWeight: active ? FontWeight.w600 : FontWeight.w400,
-            color: active ? AppColors.primary : AppColors.onSurfaceVariant,
-          );
-        }),
-        iconTheme: WidgetStateProperty.resolveWith((states) {
-          final active = states.contains(WidgetState.selected);
-          return IconThemeData(
-            color: active ? AppColors.primary : AppColors.onSurfaceVariant,
-            size: 22,
-          );
-        }),
-      ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
@@ -180,28 +158,6 @@ class AppTheme {
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         labelStyle: TextStyle(color: AppColors.dark.onSurfaceVariant),
-      ),
-      navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: AppColors.dark.surface,
-        elevation: 0,
-        shadowColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        indicatorColor: AppColors.dark.primary.withOpacity(0.16),
-        labelTextStyle: WidgetStateProperty.resolveWith((states) {
-          final active = states.contains(WidgetState.selected);
-          return TextStyle(
-            fontSize: 11,
-            fontWeight: active ? FontWeight.w600 : FontWeight.w400,
-            color: active ? AppColors.dark.primary : AppColors.dark.onSurfaceVariant,
-          );
-        }),
-        iconTheme: WidgetStateProperty.resolveWith((states) {
-          final active = states.contains(WidgetState.selected);
-          return IconThemeData(
-            color: active ? AppColors.dark.primary : AppColors.dark.onSurfaceVariant,
-            size: 22,
-          );
-        }),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: AppColors.dark.primary,
