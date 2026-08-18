@@ -73,26 +73,29 @@ class MainNavBar extends StatelessWidget {
           for (var i = 0; i < left.length; i++) destinationItem(i, left[i]),
           Expanded(
             child: Center(
-              child: Transform.translate(
-                offset: const Offset(0, -20),
-                child: GestureDetector(
-                  key: const Key('main-nav-bar-fab'),
-                  onTap: onCreatePressed,
-                  child: Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: primary,
-                      boxShadow: [
-                        BoxShadow(
-                          color: primary.withOpacity(0.45),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 14),
+                child: Transform.translate(
+                  offset: const Offset(0, -24),
+                  child: GestureDetector(
+                    key: const Key('main-nav-bar-fab'),
+                    onTap: onCreatePressed,
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: primary,
+                        boxShadow: [
+                          BoxShadow(
+                            color: primary.withOpacity(0.45),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(Icons.add, color: Colors.white, size: 22),
                     ),
-                    child: const Icon(Icons.add, color: Colors.white, size: 22),
                   ),
                 ),
               ),
