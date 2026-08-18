@@ -22,6 +22,8 @@ class TempoApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'Tempo',
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
     );
