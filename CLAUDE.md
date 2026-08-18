@@ -2,7 +2,7 @@
 
 Social calendar and smart task scheduler. Flutter app + Firebase backend, Google Calendar sync, friends/events/join-requests with a privacy model (private / friends / everyone).
 
-No `.git/` here yet — this directory isn't its own git repo. `git remote -v` inside it will resolve to whatever repo the parent directory happens to be part of; ignore that output. Run `git init` and create a real `nnavnita/tempo` (or similar) GitHub repo before serious collaborative work.
+Own git repo, remote `github.com/nnavnita/tempo`, tracking `origin/main`.
 
 ## Stack
 
