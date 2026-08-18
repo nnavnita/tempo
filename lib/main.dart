@@ -23,7 +23,12 @@ class TempoApp extends ConsumerWidget {
       title: 'Tempo',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
+      // Deliberately not ThemeMode.system yet: the dark AppTheme/AppColors
+      // infrastructure is merged and tested, but ~50 existing screens across
+      // 15 files still reference light-only AppColors.* tokens unconditionally
+      // (worst case ~1.3:1 text contrast in dark mode). Revisit once a
+      // follow-up spec migrates those call sites to dark-mode-safe tokens.
+      themeMode: ThemeMode.light,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
     );

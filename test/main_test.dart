@@ -7,7 +7,7 @@ import 'package:tempo/core/theme/app_theme.dart';
 import 'package:tempo/main.dart';
 
 void main() {
-  testWidgets('TempoApp wires light theme, dark theme, and system theme mode',
+  testWidgets('TempoApp wires light theme, dark theme, and light theme mode',
       (tester) async {
     final fakeRouter = GoRouter(
       initialLocation: '/fake',
@@ -26,6 +26,6 @@ void main() {
     final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
     expect(app.theme, AppTheme.lightTheme);
     expect(app.darkTheme, AppTheme.darkTheme);
-    expect(app.themeMode, ThemeMode.system);
+    expect(app.themeMode, ThemeMode.light);
   });
 }
