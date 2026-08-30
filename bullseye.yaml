@@ -210,3 +210,243 @@ targets:
     - visibility
     origin: subdivide(🎯T2)
     discovered: 2026-08-16
+  T3:
+    name: Events have a live shared space (chat, photos, notes, presence) and the app opens straight into it when the user is mid-event
+    status: identified
+    value: 0.0
+    cost: 0.0
+    acceptance:
+    - A user attending an in-progress event with 2+ Tempo attendees cold-starts the app and lands in that event's space without further navigation
+    - Within a space, the user can post text messages, upload photos, add shared notes, and see who else is currently present
+    - Dismissing the auto-open for an event prevents it recurring for that event on subsequent cold starts within the same event window
+    - Firestore and Storage rules restrict all space reads and writes to the event owner and attendees, verified by rules tests
+    context: |-
+      When a user opens Tempo during an event they are attending, the app should drop them directly into that event's shared space rather than the normal home surface. The space is where attendees chat, share photos, and keep shared notes for the event. Spaces exist from event creation onward and stay writable indefinitely.
+
+      Two frictions accepted at design time and carried into the sub-targets:
+      1. Hijack frequency: triggering on any synced Google Calendar event with 2+ attendees means routine meetings seize the app on launch. Mitigated by the per-event dismissal flag in T3.9, which is required rather than optional.
+      2. Identity gap: EventModel.attendeeUids holds Firestore uids, but Google Calendar attendees are email strings. Space membership is the intersection of event attendees with Tempo users. The "2+ attendees" trigger condition counts Tempo attendees, not raw calendar attendees, so the redirect never fires into an empty room. T3.7 owns that resolution.
+
+      Space access rules should read the resolved uid sets produced by T2.4's visibility resolution rather than re-deriving membership, to avoid two divergent access models in firestore.rules.
+    tags:
+    - mobile
+    - events
+    - social
+    - realtime
+    origin: manual
+    discovered: 2026-08-30
+  T3.1:
+    name: Event space subcollections (messages, notes) exist with models and membership-scoped rules
+    status: identified
+    value: 0.0
+    cost: 0.0
+    acceptance:
+    - MessageModel and NoteModel exist in lib/models/ with fromFirestore/toMap round-trip unit tests
+    - Firestore rules permit read and write on events/{eventId}/messages and events/{eventId}/notes only for the event owner and uids in attendeeUids
+    - Rules tests confirm a non-attendee is denied read and write on both subcollections
+    - Required composite indexes for message and note ordering are declared in firestore.indexes.json
+    context: |-
+      The choke point for every other space surface. Establishes events/{eventId}/messages and events/{eventId}/notes as Firestore subcollections, their Dart models alongside the existing lib/models/*_model.dart files, and the security rules that scope access to the event owner plus attendeeUids. Rules should consume the resolved uid sets from T2.4's visibility resolution where they overlap, rather than re-deriving membership independently.
+
+      Space documents exist from event creation and remain writable indefinitely — no time-window gating on reads or writes.
+    tags:
+    - mobile
+    - events
+    - firestore
+    - security
+    - tests
+    origin: manual
+    discovered: 2026-08-30
+  T3.2:
+    name: Attendees can post and read text messages in an event space in real time
+    status: identified
+    value: 0.0
+    cost: 0.0
+    acceptance:
+    - An attendee sends a message and it appears for another attendee without a manual refresh
+    - The message list loads a bounded page and pages backwards through older history rather than streaming the whole collection
+    - Sender identity and timestamp are shown per message, with consecutive messages from one sender grouped
+    - Send failures surface to the user rather than silently dropping the message
+    context: |-
+      The spine of the space — photos in T3.3 render as message entries, so the message stream is the substrate rather than a peer surface. Riverpod stream provider over events/{eventId}/messages ordered by timestamp, a message list, and a composer, following the existing provider patterns in lib/providers/.
+
+      Consider pagination from the start: an always-open space on a recurring event accumulates messages indefinitely, and an unbounded stream is a cost and performance problem.
+    depends_on:
+    - T3.1
+    tags:
+    - mobile
+    - events
+    - chat
+    - realtime
+    - ui
+    origin: manual
+    discovered: 2026-08-30
+  T3.3:
+    name: Attendees can upload photos into an event space, stored in Firebase Storage under membership-scoped rules
+    status: identified
+    value: 0.0
+    cost: 0.0
+    acceptance:
+    - An attendee picks a photo, it uploads with visible progress, and appears inline in the space timeline for all attendees
+    - Images are compressed and resized client-side before upload, with a documented ceiling on stored dimensions and file size
+    - Storage rules restrict read and write under the event's storage path to the event owner and attendees, verified by Storage rules tests
+    - Upload failure and cancellation leave no orphaned message entry or partial object
+    context: |-
+      Adds firebase_storage as a new dependency and a new cost surface — the first time Tempo stores user binary data. Photos post as entries in the T3.2 message stream so chat and media share one timeline rather than diverging.
+
+      Compression before upload is not optional: unresized phone camera output will make both storage cost and load time unacceptable. Storage rules need their own membership check — Firestore rules do not cover Storage paths, so the access model must be duplicated there and tested separately.
+    depends_on:
+    - T3.2
+    tags:
+    - mobile
+    - events
+    - media
+    - storage
+    - security
+    - tests
+    origin: manual
+    discovered: 2026-08-30
+  T3.4:
+    name: Attendees can add and edit shared notes scoped to an event
+    status: identified
+    value: 0.0
+    cost: 0.0
+    acceptance:
+    - An attendee adds a note and other attendees see it without a manual refresh
+    - Notes display author and last-updated time
+    - Edit permission behaviour is explicit in both the UI and the Firestore rules, and matches between them
+    - Deleting a note is possible and covered by rules tests
+    context: |-
+      Shared notes as an append-and-edit list of discrete note entries, not a real-time collaborative text document — collaborative text editing needs CRDT or OT machinery well beyond the value it adds here. Each note has an author, body, and timestamps; any attendee can add, and edit rules are a deliberate call (author-only versus any attendee).
+
+      Sits directly on T3.1's notes subcollection, independent of the chat stream.
+    depends_on:
+    - T3.1
+    tags:
+    - mobile
+    - events
+    - notes
+    - ui
+    origin: manual
+    discovered: 2026-08-30
+  T3.5:
+    name: An event space shows which attendees are currently present
+    status: identified
+    value: 0.0
+    cost: 0.0
+    acceptance:
+    - Entering a space marks the user present for other attendees within a few seconds
+    - Leaving the space, backgrounding the app, and losing network each clear presence within a bounded, documented window
+    - A killed app process does not leave a permanently stuck present entry
+    - The presence mechanism's steady-state write volume per active user is measured and documented
+    context: |-
+      The heaviest infrastructure item in T3 relative to its value, and the most reasonable candidate to defer to a follow-up if T3 needs to ship sooner. Presence needs either periodic heartbeat writes to Firestore (write-volume cost, stale-entry cleanup) or Firebase Realtime Database with onDisconnect (a second database product alongside Firestore).
+
+      Whichever is chosen, disconnection is the hard part: app backgrounded, network dropped, and process killed must all eventually clear presence rather than leaving ghosts in the strip.
+    depends_on:
+    - T3.6
+    tags:
+    - mobile
+    - events
+    - presence
+    - realtime
+    - infra
+    origin: manual
+    discovered: 2026-08-30
+  T3.6:
+    name: Event space shell screen at /events/:id/space renders tabbed sections and is gated on membership
+    status: identified
+    value: 0.0
+    cost: 0.0
+    acceptance:
+    - Navigating to /events/:id/space as an attendee renders the space shell with its tab bar
+    - A non-attendee navigating to the same route is redirected away and never sees space content
+    - The space is reachable from the existing event detail screen for events the user attends
+    - Widget tests cover both the member and non-member routing outcomes
+    context: |-
+      The container every content surface mounts into. A go_router route under the existing shell structure, with tabs for chat, photos, and notes. Non-members hitting the route directly are redirected rather than shown an empty or erroring screen — client-side gating mirrors the T3.1 rules, it does not replace them.
+
+      Note the routing precedent set by commit 096ea51, which moved /notifications out of the ShellRoute: decide deliberately whether the space belongs inside the bottom-nav shell or outside it. A full-bleed immersive space likely belongs outside.
+    depends_on:
+    - T3.1
+    tags:
+    - mobile
+    - events
+    - ui
+    - routing
+    - tests
+    origin: manual
+    discovered: 2026-08-30
+  T3.7:
+    name: Google-only calendar events lazily mint a Tempo event doc with attendee emails resolved to Tempo uids
+    status: identified
+    value: 0.0
+    cost: 0.0
+    acceptance:
+    - Entering the space for a synced Google Calendar event with no Tempo doc creates exactly one EventModel doc linked by googleCalendarEventId
+    - Attendee emails matching existing Tempo accounts appear in attendeeUids; non-matching emails do not
+    - Concurrent entry from two clients results in a single event doc, verified by a test exercising the idempotency path
+    - A minted event is distinguishable from a Tempo-authored one so it does not pollute the user's own event lists unexpectedly
+    context: |-
+      Bridges the identity gap between the two attendee representations. Google Calendar attendees are email strings; EventModel.attendeeUids holds Firestore uids. A calendar event that was never created in Tempo has no event doc, so it has nothing for a space to hang off.
+
+      On first space entry for such an event, mint an EventModel doc keyed off the Google Calendar event id, and resolve each attendee email against Tempo user accounts, populating attendeeUids with those that match. Attendees without Tempo accounts are simply absent from the space — this is expected, and is what makes the Tempo-attendee count in T3.8 meaningful.
+
+      Minting must be idempotent: two devices entering the same event concurrently must not create duplicate docs.
+    tags:
+    - mobile
+    - events
+    - calendar
+    - identity
+    origin: manual
+    discovered: 2026-08-30
+  T3.8:
+    name: A live-event resolver returns the user's currently in-progress event with 2+ Tempo attendees
+    status: identified
+    value: 0.0
+    cost: 0.0
+    acceptance:
+    - Given a set of events and a fixed now(), the resolver returns the correct in-progress event, covered by unit tests including boundary cases at exact start and end times
+    - Events with fewer than two Tempo attendees are never returned
+    - Overlapping in-progress events resolve by a documented, tested rule
+    - All-day events and events spanning a timezone change are handled explicitly and tested
+    context: |-
+      Pure logic, independently unit-testable, and the piece that decides whether the redirect fires at all. Given the current time and the user's events, return the event now in progress that has at least two Tempo attendees — counting resolved uids, never raw Google Calendar attendee emails, so the redirect cannot fire into a room where nobody else has an account.
+
+      Overlapping events are the interesting case and need an explicit rule (most recently started, shortest, or the one the user owns). Timezone and all-day event handling are exactly where this kind of logic usually breaks; test both.
+    depends_on:
+    - T3.7
+    tags:
+    - mobile
+    - events
+    - calendar
+    - tests
+    origin: manual
+    discovered: 2026-08-30
+  T3.9:
+    name: App launch redirects into the live event space, with a per-event dismissal flag preventing re-hijack
+    status: identified
+    value: 0.0
+    cost: 0.0
+    acceptance:
+    - Cold-starting while attending an in-progress qualifying event lands the user in that event's space with no intermediate navigation
+    - Dismissing the space for an event means later cold starts within that same event window go to the normal home surface
+    - Cold-starting with no qualifying in-progress event goes to the normal home surface unchanged
+    - The redirect never preempts sign-in or onboarding, and never fires before auth state has resolved
+    - Back navigation from an auto-opened space reaches the normal home surface rather than exiting the app
+    context: |-
+      The payoff node, and the one with the most user-facing risk. On cold start, if T3.8 reports an in-progress event, the router sends the user straight to that event's space instead of the normal home surface.
+
+      The dismissal flag is required, not optional. Triggering on any synced Google Calendar event means routine meetings — standups, appointments, recruiter invites — will seize the app on launch. Once the user dismisses the space for a given event, that event must not redirect again for the remainder of its window. Flag storage should be local rather than Firestore: it is device-scoped UI state, not shared event data.
+
+      Redirect must not fight the auth or onboarding flows, and must not fire before auth state resolves.
+    depends_on:
+    - T3.6
+    - T3.8
+    tags:
+    - mobile
+    - events
+    - routing
+    - ux
+    origin: manual
+    discovered: 2026-08-30
