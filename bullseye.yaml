@@ -58,7 +58,7 @@ targets:
     discovered: 2026-08-16
   T2.1:
     name: Friend groups exist as a private, owner-scoped Firestore collection with CRUD
-    status: identified
+    status: achieved
     value: 0.0
     cost: 0.0
     acceptance:
@@ -73,6 +73,7 @@ targets:
     - groups
     origin: subdivide(🎯T2)
     discovered: 2026-08-16
+    achieved: 2026-09-19
   T2.2:
     name: User can create, rename, delete groups and manage membership from a dedicated screen
     status: identified
@@ -95,7 +96,7 @@ targets:
     discovered: 2026-08-16
   T2.3:
     name: EventModel supports include/exclude group and friend targeting with denormalized visibleUids/excludeUids fields
-    status: identified
+    status: achieved
     value: 0.0
     cost: 0.0
     acceptance:
@@ -109,6 +110,7 @@ targets:
     - visibility
     origin: subdivide(🎯T2)
     discovered: 2026-08-16
+    achieved: 2026-09-19
   T2.4:
     name: Visibility resolution service expands groups+individuals into deduped uid sets, covered by unit tests
     status: identified
