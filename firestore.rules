@@ -53,6 +53,15 @@ service cloud.firestore {
       allow delete: if isSignedIn() && isOwner(resource.data.ownerUid);
     }
 
+    // ── friend_groups ──────────────────────────────────────────────────────────
+
+    match /friend_groups/{groupId} {
+      // Groups are private to their owner. Members never learn they are in one
+      // except indirectly, via events targeted at the group.
+      allow read, update, delete: if isSignedIn() && isOwner(resource.data.ownerUid);
+      allow create: if isSignedIn() && isOwner(request.resource.data.ownerUid);
+    }
+
     // ── friendships ────────────────────────────────────────────────────────────
 
     match /friendships/{docId} {

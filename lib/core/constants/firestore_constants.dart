@@ -8,6 +8,7 @@ class FirestoreConstants {
   static const String joinRequestsCollection = 'join_requests';
   static const String invitationsCollection = 'invitations';
   static const String busySlotsCollection = 'busy_slots';
+  static const String friendGroupsCollection = 'friend_groups';
 
   // User fields
   static const String uid = 'uid';
@@ -29,6 +30,19 @@ class FirestoreConstants {
   static const String visibility = 'visibility';
   static const String googleCalendarEventId = 'googleCalendarEventId';
   static const String attendeeUids = 'attendeeUids';
+
+  // Event visibility targeting fields
+  static const String includeGroupIds = 'includeGroupIds';
+  static const String includeFriendUids = 'includeFriendUids';
+  static const String excludeGroupIds = 'excludeGroupIds';
+  static const String excludeFriendUids = 'excludeFriendUids';
+  static const String visibleUids = 'visibleUids';
+  static const String excludeUids = 'excludeUids';
+
+  // Friend group fields (reuses ownerUid, createdAt, updatedAt)
+  static const String groupId = 'groupId';
+  static const String name = 'name';
+  static const String memberUids = 'memberUids';
 
   // Friendship fields
   static const String users = 'users';
