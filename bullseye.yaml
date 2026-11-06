@@ -50,6 +50,88 @@ targets:
     - a11y
     origin: manual
     discovered: 2026-11-06
+  T11:
+    name: The spine is verified on real Android and iOS hardware, not just in tests
+    status: identified
+    value: 0.0
+    cost: 0.0
+    acceptance:
+    - Google Sign-In completes on a physical Android device and a physical iPhone
+    - Calendar scope consented and real busy intervals come back from the user's primary calendar
+    - A captured task is placed into a gap that matches what the real calendar shows
+    - A slot notification actually fires at the slot start on both platforms, with the app backgrounded
+    - A notification still fires after the device is rebooted (Android boot receiver path)
+    - The FCM re-plan push is received and triggers a re-plan with the app backgrounded
+    - Offline capture and planning behave as designed, with the degraded banner visible
+    context: 'Nothing in v1 has run on real hardware — it was built and verified entirely through flutter analyze, 66 unit tests and a release APK build. Everything touching the OS or Google''s servers is therefore unproven in practice: the OAuth consent flow, Calendar round-trip, exact-alarm notification delivery under Doze, the boot receiver, and FCM wake-up. This is the single largest gap between "tests pass" and "it works", and it blocks release.'
+    depends_on:
+    - T4
+    tags:
+    - mobile
+    - verification
+    - blocked-on-human
+    origin: manual
+    discovered: 2026-11-06
+  T12:
+    name: User can pin a task to a chosen time and the planner schedules around it instead of overriding it
+    status: identified
+    value: 0.0
+    cost: 0.0
+    acceptance:
+    - A task can be given a fixed start time from the plan or triage screen
+    - Pinned slots are treated as busy by the solver and never moved by a re-plan
+    - A pinned slot that becomes impossible (the calendar fills under it) surfaces in triage rather than being silently unpinned
+    - Unpinning returns the task to automatic placement
+    - Solver tests cover pinned-around placement and the impossible-pin case
+    context: 'One of the two original design intentions from the AI-time-organiser idea that v1 did not deliver: "AI proposes scheduling by default; user preferences always override, partially or fully." Right now placement is entirely automatic and the user cannot say "no, this happens Thursday morning". Triage offers shrink, drop or retry — but not hand-schedule, despite the UI copy suggesting it.'
+    depends_on:
+    - T4
+    tags:
+    - mobile
+    - planner
+    - ux
+    origin: manual
+    discovered: 2026-11-06
+  T13:
+    name: Same-kind tasks are spread across the week rather than clustered into the first available gaps
+    status: identified
+    value: 0.0
+    cost: 0.0
+    acceptance:
+    - Tasks carry a kind or tag used by the solver as a spreading signal
+    - Placement penalises putting several tasks of one kind on the same day when later capacity exists
+    - Spreading never overrides a deadline — feasibility still wins
+    - Solver stays pure and deterministic
+    - 'Tests cover: three tasks of one kind spread across days; the same three with a tight deadline correctly clustered anyway'
+    context: 'The second original design intention v1 did not deliver: "no clustering — spread same-type tasks across the week". The current solver is strict first-fit, so five chores land back to back in the first free afternoon, which is exactly the rigid schedule the user said they do badly with. This changes the solver''s objective from pure feasibility to feasibility plus a spreading preference, so it needs care to stay deterministic and to keep deadlines dominant.'
+    depends_on:
+    - T4
+    tags:
+    - mobile
+    - planner
+    - ux
+    origin: manual
+    discovered: 2026-11-06
+  T14:
+    name: Reminders fire at a moment the user can act on, not just at the slot's clock time
+    status: identified
+    value: 0.0
+    cost: 0.0
+    acceptance:
+    - A reminder is suppressed or deferred when the user is demonstrably mid-commitment (an overrunning calendar event)
+    - Reminders respect a quiet-hours setting
+    - Location-aware deferral for tasks tagged as place-dependent
+    - Dismissing a reminder is recorded and feeds the slip signal rather than being lost
+    - User can snooze a slot, which re-plans rather than silently dropping it
+    context: 'Phase 3 of the spec, addressing the fourth failure mode directly. v1 gets most of the way there for free — a notification tied to a placed slot is already better-timed than an arbitrary clock alarm — which is why this was deliberately deferred. What remains is the genuinely context-dependent part. The dismissal-tracking criterion matters most: right now a dismissed reminder tells the system nothing, so a user quietly ignoring reminders looks identical to one who has no reminders.'
+    depends_on:
+    - T4
+    tags:
+    - mobile
+    - notifications
+    - ux
+    origin: manual
+    discovered: 2026-11-06
   T2:
     name: Friend sub-groups exist and event visibility can target/exclude specific groups or individuals, on top of the existing private/friends/everyone tiers
     status: set_aside
@@ -529,6 +611,7 @@ targets:
     context: 'Repo-side work is done: signing config, R8 and ProGuard rules, notification permissions and boot receivers, iOS background modes, and drafts for the privacy policy, Data Safety answers and listing copy — all in docs/release/. Everything remaining needs the account holder''s identity, payment or 2FA and cannot be delegated; release-checklist.md separates the two. Two items drive the timeline rather than the build: Google''s verification review for the sensitive calendar scope, and Play''s 20-tester / 14-day closed test if it applies to this account. Both are calendar time, so start them early.'
     depends_on:
     - T4
+    - T11
     tags:
     - mobile
     - release
