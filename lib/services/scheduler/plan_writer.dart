@@ -3,6 +3,7 @@ import '../../models/plan_state.dart';
 import '../../models/scheduled_slot.dart';
 import '../../models/task_model.dart';
 import '../../models/working_hours.dart';
+import '../calendar/busy_interval_source.dart';
 import '../calendar/google_calendar_service.dart';
 import '../firestore/busy_cache_repository.dart';
 import '../firestore/plan_state_repository.dart';
@@ -37,7 +38,7 @@ class PlanOutcome {
 /// plan state. Keeping it here is what lets [solvePlacements] stay pure.
 class PlanWriter {
   PlanWriter({
-    required GoogleCalendarService calendarService,
+    required BusyIntervalSource calendarService,
     required TaskRepository taskRepository,
     required SlotRepository slotRepository,
     required PlanStateRepository planStateRepository,
@@ -48,7 +49,7 @@ class PlanWriter {
         _planState = planStateRepository,
         _busyCache = busyCacheRepository;
 
-  final GoogleCalendarService _calendar;
+  final BusyIntervalSource _calendar;
   final TaskRepository _tasks;
   final SlotRepository _slots;
   final PlanStateRepository _planState;

@@ -1,6 +1,7 @@
 import 'package:googleapis/calendar/v3.dart' as gcal;
 import '../auth/auth_token_service.dart';
 import '../scheduler/time_interval.dart';
+import 'busy_interval_source.dart';
 
 /// Thrown when the Calendar API cannot be reached or refuses the request.
 ///
@@ -16,7 +17,7 @@ class CalendarUnavailable implements Exception {
   String toString() => 'CalendarUnavailable: $message';
 }
 
-class GoogleCalendarService {
+class GoogleCalendarService implements BusyIntervalSource {
   GoogleCalendarService({required AuthTokenService authTokenService})
       : _authTokenService = authTokenService;
 
@@ -54,6 +55,7 @@ class GoogleCalendarService {
   /// unavailable hours, and treating them as busy would wipe out the whole
   /// working window. Declined events are skipped for the same reason —
   /// they are not actually commitments.
+  @override
   Future<List<TimeInterval>> fetchBusyIntervals(
     DateTime start,
     DateTime end,

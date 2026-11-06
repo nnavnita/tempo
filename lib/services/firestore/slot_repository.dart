@@ -14,8 +14,14 @@ class SlotRepository {
           .doc(uid)
           .collection(FirestoreConstants.slotsCollection);
 
-  /// Writes a fresh plan: drops future slots belonging to older plan
-  /// versions, then writes the new ones, in one batch.
+  /// Writes a fresh plan: drops future slots the new plan no longer contains,
+  /// then writes the new ones, in one batch.
+  ///
+  /// Only genuinely stale ids are deleted. Slot ids are deterministic
+  /// (task + start), so a re-plan that lands a task in the same place
+  /// produces the same id — deleting and re-setting that id in one batch
+  /// would be two writes to one document, whose outcome depends on how the
+  /// backend orders them. Diffing by id avoids the question entirely.
   ///
   /// Past slots are left alone deliberately — they are the record of what
   /// actually happened, and slip detection needs them.
@@ -25,13 +31,14 @@ class SlotRepository {
     required DateTime from,
   }) async {
     final batch = _firestore.batch();
+    final keep = slots.map((s) => s.slotId).toSet();
 
-    final stale = await _slots(uid)
+    final existing = await _slots(uid)
         .where(FirestoreConstants.start,
             isGreaterThanOrEqualTo: Timestamp.fromDate(from))
         .get();
-    for (final doc in stale.docs) {
-      batch.delete(doc.reference);
+    for (final doc in existing.docs) {
+      if (!keep.contains(doc.id)) batch.delete(doc.reference);
     }
 
     for (final slot in slots) {
