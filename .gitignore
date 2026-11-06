@@ -54,3 +54,8 @@ macos/Runner/GoogleService-Info.plist
 # Cloud Functions
 functions/node_modules/
 functions/.env
+
+# Android release signing — never commit
+android/key.properties
+*.jks
+*.keystore

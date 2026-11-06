@@ -1,0 +1,13 @@
+# Copy to android/key.properties and fill in. Never commit the real file.
+#
+# Create the upload keystore first:
+#   keytool -genkey -v -keystore ~/tempo-upload.jks \
+#     -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+#
+# Keep that .jks and these passwords backed up somewhere you will not lose
+# them. Losing the upload key means you cannot ship an update to an existing
+# Play listing without going through Google's key-reset process.
+storeFile=/absolute/path/to/tempo-upload.jks
+storePassword=
+keyAlias=upload
+keyPassword=

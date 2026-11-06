@@ -79,5 +79,12 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>Tempo reminds you when a block of planned work is due to start.</string>
 </dict>
 </plist>
