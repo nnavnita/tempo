@@ -24,7 +24,9 @@ class _PlanScreenState extends ConsumerState<PlanScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(planControllerProvider).replan(ReplanReason.appForegrounded);
+      final controller = ref.read(planControllerProvider);
+      controller.registerForReplanPushes();
+      controller.replan(ReplanReason.appForegrounded);
     });
   }
 

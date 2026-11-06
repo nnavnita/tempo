@@ -30,17 +30,4 @@ class UserRepository {
   Future<void> updateFcmToken(String uid, String token) async {
     await _col.doc(uid).update({'fcmToken': token, 'updatedAt': FieldValue.serverTimestamp()});
   }
-
-  /// Search users by displayName prefix (case-sensitive).
-  /// Requires a Firestore composite index on [displayName].
-  Future<List<UserModel>> searchByName(String query, {int limit = 20}) async {
-    if (query.isEmpty) return [];
-    final end = '$query\uf8ff';
-    final snapshot = await _col
-        .where('displayName', isGreaterThanOrEqualTo: query)
-        .where('displayName', isLessThanOrEqualTo: end)
-        .limit(limit)
-        .get();
-    return snapshot.docs.map(UserModel.fromFirestore).toList();
-  }
 }

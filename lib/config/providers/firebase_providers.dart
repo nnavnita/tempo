@@ -11,6 +11,7 @@ import '../../services/firestore/plan_state_repository.dart';
 import '../../services/firestore/slot_repository.dart';
 import '../../services/firestore/task_repository.dart';
 import '../../services/firestore/user_repository.dart';
+import '../../services/notifications/replan_messaging_service.dart';
 import '../../services/notifications/slot_notification_scheduler.dart';
 import '../../services/scheduler/plan_writer.dart';
 
@@ -50,6 +51,11 @@ final googleCalendarServiceProvider = Provider<GoogleCalendarService>((ref) {
 final slotNotificationSchedulerProvider =
     Provider<SlotNotificationScheduler>((ref) {
   return SlotNotificationScheduler();
+});
+
+final replanMessagingServiceProvider =
+    Provider<ReplanMessagingService>((ref) {
+  return ReplanMessagingService();
 });
 
 // ── Repositories ──────────────────────────────────────────────────────────────

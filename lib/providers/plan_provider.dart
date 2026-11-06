@@ -123,6 +123,35 @@ class PlanController {
     await replan(ReplanReason.taskChanged);
   }
 
+  /// Registers this device for the server's re-plan pushes and re-plans
+  /// whenever one arrives.
+  ///
+  /// Idempotent: safe to call on every app start.
+  Future<void> registerForReplanPushes() async {
+    final uid = _ref.read(currentUidProvider);
+    if (uid == null) return;
+
+    final messaging = _ref.read(replanMessagingServiceProvider);
+    await messaging.requestPermission();
+
+    final token = await messaging.currentToken();
+    if (token != null) {
+      await _ref.read(userRepositoryProvider).updateFcmToken(uid, token);
+    }
+
+    // Tokens rotate on reinstall, restore and cache clear. Missing a
+    // rotation means the server quietly loses the ability to reach this
+    // device, and the user just stops getting reminders.
+    messaging.tokenRefreshes.listen((refreshed) {
+      final currentUid = _ref.read(currentUidProvider);
+      if (currentUid != null) {
+        _ref.read(userRepositoryProvider).updateFcmToken(currentUid, refreshed);
+      }
+    });
+
+    messaging.listen(() => replan(ReplanReason.slotElapsed));
+  }
+
   Future<void> _syncNotifications(String uid, DateTime now) async {
     final slots = await _ref.read(slotRepositoryProvider).fetchUpcoming(
           uid,
