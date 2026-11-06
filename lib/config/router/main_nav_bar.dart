@@ -29,9 +29,9 @@ class MainNavBar extends StatelessWidget {
   final VoidCallback onCreatePressed;
 
   static const _destinations = [
-    (icon: Icons.calendar_month_outlined, activeIcon: Icons.calendar_month, label: 'Calendar'),
-    (icon: Icons.explore_outlined, activeIcon: Icons.explore, label: 'Feed'),
-    (icon: Icons.people_outline, activeIcon: Icons.people, label: 'Friends'),
+    (icon: Icons.today_outlined, activeIcon: Icons.today, label: 'Today'),
+    (icon: Icons.calendar_month_outlined, activeIcon: Icons.calendar_month, label: 'Horizon'),
+    (icon: Icons.inbox_outlined, activeIcon: Icons.inbox, label: 'Triage'),
     (icon: Icons.person_outline, activeIcon: Icons.person, label: 'Profile'),
   ];
 
@@ -143,7 +143,7 @@ class MainNavBar extends StatelessWidget {
             child: Center(
               child: Semantics(
                 button: true,
-                label: 'Create event',
+                label: 'New task',
                 child: GestureDetector(
                   key: const Key('main-nav-bar-fab'),
                   onTap: onCreatePressed,
@@ -156,7 +156,7 @@ class MainNavBar extends StatelessWidget {
                         color: primary,
                         boxShadow: [
                           BoxShadow(
-                            color: primary.withOpacity(0.45),
+                            color: primary.withValues(alpha: 0.45),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),

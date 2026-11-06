@@ -12,7 +12,7 @@ void main() {
     final fakeRouter = GoRouter(
       initialLocation: '/fake',
       routes: [
-        GoRoute(path: '/fake', builder: (_, __) => const SizedBox()),
+        GoRoute(path: '/fake', builder: (_, _) => const SizedBox()),
       ],
     );
 
