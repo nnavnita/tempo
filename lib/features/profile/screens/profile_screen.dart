@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../config/providers/firebase_providers.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/notification_bell_action.dart';
 import '../../../providers/user_provider.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -14,10 +13,7 @@ class ProfileScreen extends ConsumerWidget {
     final userAsync = ref.watch(currentUserProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        actions: const [NotificationBellAction()],
-      ),
+      appBar: AppBar(title: const Text('Profile')),
       body: userAsync.when(
         data: (user) {
           if (user == null) return const Center(child: Text('Not signed in'));
@@ -33,13 +29,13 @@ class ProfileScreen extends ConsumerWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: AppColors.primary.withOpacity(0.2),
+                            color: AppColors.primary.withValues(alpha: 0.2),
                             width: 3,
                           ),
                         ),
                         child: CircleAvatar(
                           radius: 44,
-                          backgroundColor: AppColors.primary.withOpacity(0.08),
+                          backgroundColor: AppColors.primary.withValues(alpha: 0.08),
                           backgroundImage: user.photoURL != null
                               ? CachedNetworkImageProvider(user.photoURL!)
                               : null,
@@ -89,7 +85,7 @@ class ProfileScreen extends ConsumerWidget {
                     onPressed: () => ref.read(authServiceProvider).signOut(),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.error,
-                      side: BorderSide(color: AppColors.error.withOpacity(0.4)),
+                      side: BorderSide(color: AppColors.error.withValues(alpha: 0.4)),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),

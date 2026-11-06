@@ -50,3 +50,12 @@ ios/Runner/GoogleService-Info.plist
 macos/Runner/GoogleService-Info.plist
 
 .superpowers/
+
+# Cloud Functions
+functions/node_modules/
+functions/.env
+
+# Android release signing — never commit
+android/key.properties
+*.jks
+*.keystore

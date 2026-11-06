@@ -10,19 +10,14 @@ class AppConstants {
     'https://www.googleapis.com/auth/calendar',
   ];
 
-  // Event visibility values
-  static const String visibilityPrivate = 'private';
-  static const String visibilityFriends = 'friends';
-  static const String visibilityEveryone = 'everyone';
+  /// How many slot notifications to register with the OS at once.
+  ///
+  /// iOS caps pending local notifications at 64 per app and silently drops
+  /// the rest, so the client only ever holds the near horizon. Everything
+  /// beyond this — and every re-plan alert — arrives by FCM from the
+  /// scheduled Cloud Function.
+  static const int localNotificationHorizon = 20;
 
-  // Friendship status values
-  static const String friendshipPending = 'pending';
-  static const String friendshipAccepted = 'accepted';
-
-  // Request/invitation status values
-  static const String statusPending = 'pending';
-  static const String statusApproved = 'approved';
-  static const String statusDenied = 'denied';
-  static const String statusAccepted = 'accepted';
-  static const String statusRejected = 'rejected';
+  /// Fallback zone when the device zone cannot be resolved.
+  static const String fallbackTimeZone = 'Australia/Melbourne';
 }

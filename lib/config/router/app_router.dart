@@ -3,21 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart' hide ProviderRef;
 import 'package:go_router/go_router.dart';
 import '../../core/constants/route_constants.dart';
 import '../../features/auth/screens/login_screen.dart';
-import '../../features/calendar/screens/calendar_screen.dart';
-import '../../features/events/screens/create_event_screen.dart';
-import '../../features/events/screens/edit_event_screen.dart';
-import '../../features/events/screens/event_detail_screen.dart';
-import '../../features/feed/screens/friends_feed_screen.dart';
-import '../../features/friends/screens/friend_requests_screen.dart';
-import '../../features/friends/screens/friends_list_screen.dart';
-import '../../features/friends/screens/user_search_screen.dart';
-import '../../features/notifications/screens/notifications_screen.dart';
+import '../../features/capture/screens/capture_screen.dart';
+import '../../features/plan/screens/plan_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
+import '../../features/triage/screens/triage_screen.dart';
 import '../../providers/auth_provider.dart';
 import 'main_nav_bar.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
-  // Listen to auth state for redirect
   final authNotifier = _AuthNotifier(ref);
 
   return GoRouter(
@@ -31,7 +24,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final onLogin = state.matchedLocation == RouteConstants.login;
 
       if (!isSignedIn && !onLogin) return RouteConstants.login;
-      if (isSignedIn && onLogin) return RouteConstants.calendar;
+      if (isSignedIn && onLogin) return RouteConstants.plan;
       return null;
     },
     routes: [
@@ -41,29 +34,19 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       ShellRoute(
         builder: (context, state, child) =>
-            _MainShell(child: child, state: state),
+            _MainShell(state: state, child: child),
         routes: [
           GoRoute(
-            path: RouteConstants.calendar,
-            builder: (context, state) => const CalendarScreen(),
+            path: RouteConstants.plan,
+            builder: (context, state) => const PlanScreen(),
           ),
           GoRoute(
-            path: RouteConstants.feed,
-            builder: (context, state) => const FriendsFeedScreen(),
+            path: RouteConstants.horizon,
+            builder: (context, state) => const HorizonScreen(),
           ),
           GoRoute(
-            path: RouteConstants.friends,
-            builder: (context, state) => const FriendsListScreen(),
-            routes: [
-              GoRoute(
-                path: 'requests',
-                builder: (context, state) => const FriendRequestsScreen(),
-              ),
-              GoRoute(
-                path: 'search',
-                builder: (context, state) => const UserSearchScreen(),
-              ),
-            ],
+            path: RouteConstants.triage,
+            builder: (context, state) => const TriageScreen(),
           ),
           GoRoute(
             path: RouteConstants.profile,
@@ -71,29 +54,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
+      // Outside the shell so capture covers the nav bar — it is a modal
+      // task, not a tab.
       GoRoute(
-        path: RouteConstants.createEvent,
-        builder: (context, state) => const CreateEventScreen(),
-      ),
-      GoRoute(
-        path: RouteConstants.notifications,
-        builder: (context, state) => const NotificationsScreen(),
-      ),
-      GoRoute(
-        path: '/event/:eventId',
-        builder: (context, state) {
-          final eventId = state.pathParameters['eventId']!;
-          return EventDetailScreen(eventId: eventId);
-        },
-        routes: [
-          GoRoute(
-            path: 'edit',
-            builder: (context, state) {
-              final eventId = state.pathParameters['eventId']!;
-              return EditEventScreen(eventId: eventId);
-            },
-          ),
-        ],
+        path: RouteConstants.capture,
+        builder: (context, state) => const CaptureScreen(),
       ),
     ],
   );
@@ -102,7 +67,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 /// Notifies the router whenever auth state changes.
 class _AuthNotifier extends ChangeNotifier {
   _AuthNotifier(Ref ref) {
-    ref.listen(authStateProvider, (_, __) => notifyListeners());
+    ref.listen(authStateProvider, (_, _) => notifyListeners());
   }
 }
 
@@ -114,9 +79,9 @@ class _MainShell extends StatelessWidget {
   final GoRouterState state;
 
   int _currentIndex(String location) {
-    if (location.startsWith('/friends')) return 2;
-    if (location.startsWith('/feed')) return 1;
-    if (location.startsWith('/profile')) return 3;
+    if (location.startsWith(RouteConstants.horizon)) return 1;
+    if (location.startsWith(RouteConstants.triage)) return 2;
+    if (location.startsWith(RouteConstants.profile)) return 3;
     return 0;
   }
 
@@ -130,16 +95,16 @@ class _MainShell extends StatelessWidget {
         onDestinationSelected: (i) {
           switch (i) {
             case 0:
-              context.go(RouteConstants.calendar);
+              context.go(RouteConstants.plan);
             case 1:
-              context.go(RouteConstants.feed);
+              context.go(RouteConstants.horizon);
             case 2:
-              context.go(RouteConstants.friends);
+              context.go(RouteConstants.triage);
             case 3:
               context.go(RouteConstants.profile);
           }
         },
-        onCreatePressed: () => context.push(RouteConstants.createEvent),
+        onCreatePressed: () => context.push(RouteConstants.capture),
       ),
     );
   }

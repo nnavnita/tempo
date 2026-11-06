@@ -24,9 +24,9 @@ void main() {
       onCreatePressed: () {},
     )));
 
-    expect(find.text('Calendar'), findsOneWidget);
-    expect(find.text('Feed'), findsOneWidget);
-    expect(find.text('Friends'), findsOneWidget);
+    expect(find.text('Today'), findsOneWidget);
+    expect(find.text('Horizon'), findsOneWidget);
+    expect(find.text('Triage'), findsOneWidget);
     expect(find.text('Profile'), findsOneWidget);
     expect(find.text('Alerts'), findsNothing);
   });
@@ -40,7 +40,7 @@ void main() {
       onCreatePressed: () {},
     )));
 
-    await tester.tap(find.text('Friends'));
+    await tester.tap(find.text('Triage'));
     expect(tapped, 2);
 
     await tester.tap(find.text('Profile'));
@@ -71,8 +71,8 @@ void main() {
       onCreatePressed: () {},
     )));
 
-    final feedText = tester.widget<Text>(find.text('Feed'));
-    final calendarText = tester.widget<Text>(find.text('Calendar'));
+    final feedText = tester.widget<Text>(find.text('Horizon'));
+    final calendarText = tester.widget<Text>(find.text('Today'));
     expect(feedText.style?.fontWeight, FontWeight.w600);
     expect(calendarText.style?.fontWeight, FontWeight.w400);
   });

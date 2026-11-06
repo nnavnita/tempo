@@ -1,35 +1,75 @@
 # tempo
 
-Social calendar and smart task scheduler. Block out time on your calendar and control exactly who sees it — friends, specific friend groups, or the public — then let people request to join, invite them yourself, and keep the whole thing in sync with Google Calendar.
+A planner that puts your tasks into the actual free gaps in your calendar,
+and re-plans when you slip.
 
 ## Why
 
-Most calendar apps are either private-only (Google Calendar) or public-event-only (Meetup, Eventbrite). Tempo sits in between: every event carries its own visibility — private, friends-only, or public — and approving a join request or sending an invite automatically blocks that time out on the other person's calendar too, so plans stay in sync without manual re-entry.
+A list tells you what to do. It does not tell you *when*, which is why lists
+quietly become graveyards.
+
+Tempo asks one extra question when you add a task — how long will this take —
+and then does something with the answer. It reads your Google Calendar, finds
+the time you are genuinely free, and places the task there. Your plan is made
+of real times.
+
+The part most planners get wrong is what happens when you miss something. A
+plan you have fallen behind is a plan that is now wrong, and quietly
+rescheduling forever is how an app turns into a source of guilt. Tempo
+re-plans when you slip — and after three misses it stops pretending, flags
+the task as stuck, and asks you to shrink it, drop it, or schedule it
+yourself.
+
+## Principles
+
+- **Nothing is ever silently dropped.** After every plan run each task is in
+  exactly one visible state. A task that will not fit says *why* — no gap
+  big enough, or no gap left before its deadline.
+- **Slip recovery is the product**, not a feature bolted on later.
+- **Degraded planning is visible.** If the calendar cannot be reached, Tempo
+  plans from cache and says so, rather than booking over your real
+  commitments in silence.
 
 ## Features
 
-- **Google Sign-In + Calendar sync** — events created in Tempo are mirrored into your Google Calendar, and vice versa via busy-slot tracking.
-- **Visibility tiers** — `private` / `friends` / `everyone` per event, enforced server-side by Firestore security rules, not just hidden in the UI.
-- **Friends graph** — send/accept friend requests, browse a friend's public and friends-visible events.
-- **Join requests & invitations** — request to join someone else's event, or invite people to yours; approval blocks the time on both calendars.
-- **Public feed** — see `everyone`-visibility events from people you follow.
-- **Notifications inbox** — friend requests, join requests, and invitations all flow through one place.
+- **Duration-first capture** — tasks carry an estimate, a deadline and a
+  priority, because that is what makes them schedulable
+- **Automatic placement** — earliest-deadline-first into real free gaps,
+  reading busy time from Google Calendar
+- **Splittable tasks** — long work chunked across several gaps, never below
+  a minimum useful block
+- **Slip recovery** — missed blocks are detected server-side even with the
+  app closed, then re-planned
+- **Triage** — stuck, overdue and unplaceable tasks surface with the actual
+  reason, not a shrug
+- **Reminders** at the start of each planned block
 
 ## Stack
 
-- **Flutter** (Dart) — Android, iOS, web from one codebase
+- **Flutter** (Dart) — Android and iOS
 - **Firebase** — Auth (Google Sign-In), Firestore, Cloud Messaging
-- **Riverpod** — state management / providers
-- **go_router** — declarative routing
-- **Google Calendar API** — two-way event sync via OAuth
+- **Cloud Functions** (Node 20) — slip detection and re-plan pushes
+- **Riverpod** — state management, hand-written providers
+- **go_router** — routing
+- **Google Calendar API** — free/busy via OAuth
 
 ## Status
 
-Actively developed. Core MVP (auth, events, calendar sync, friends, join requests, feed, notifications) is implemented; see [`bullseye.yaml`](bullseye.yaml) for the live roadmap of what's built vs. in progress — friend sub-groups and finer-grained per-event visibility (share with a specific group, hide from specific people) are in progress next.
+v1 spine is implemented: capture → placement → reminders → slip recovery.
+Not yet released to the app stores; see
+[`docs/release/release-checklist.md`](docs/release/release-checklist.md).
+
+Planned next: voice and natural-language capture with inferred durations,
+smarter resurfacing, and context-aware reminder delivery. See
+[`bullseye.yaml`](bullseye.yaml) for the live roadmap.
+
+> Tempo was a social calendar until November 2026. That build is archived at
+> tag `archive-social-v1`.
 
 ## Getting started
 
-Full setup walkthrough — Firebase project creation, `flutterfire configure`, platform-specific config, Firestore rules/indexes — is in [`SETUP.md`](SETUP.md).
+Full walkthrough — Firebase setup, `flutterfire configure`, platform config,
+rules and indexes, functions deploy — is in [`SETUP.md`](SETUP.md).
 
 ```bash
 flutter pub get
@@ -40,11 +80,20 @@ flutter run
 
 ```
 lib/
-├── main.dart                  Firebase init, ProviderScope
-├── config/providers/          Riverpod service providers
-├── config/router/             go_router + bottom nav shell
-├── models/                    Firestore data models
-├── services/{auth,calendar,firestore}/
-├── providers/                 Riverpod stream/future providers
-└── features/{auth,calendar,events,friends,feed,notifications,profile}/
+├── main.dart                  Firebase + timezone init
+├── config/{providers,router}/ Riverpod wiring, go_router shell
+├── models/                    task, scheduled_slot, plan_state, working_hours
+├── services/scheduler/        intervals, gap extraction, solver, plan writer
+├── services/calendar/         Google Calendar client behind a narrow seam
+├── services/firestore/        repositories
+├── services/notifications/    local scheduling + FCM
+└── features/{auth,capture,plan,triage,profile}/
+functions/                     slip detection + re-plan push
+```
+
+## Testing
+
+```bash
+flutter analyze && flutter test     # 66 tests
+cd functions && node --test         # 6 tests
 ```

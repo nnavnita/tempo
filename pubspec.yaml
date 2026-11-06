@@ -1,5 +1,5 @@
 name: tempo
-description: Social calendar and smart task scheduler
+description: Personal auto-scheduling planner — tasks placed into real calendar gaps, re-planned when you slip.
 version: 1.0.0+1
 publish_to: 'none'
 
@@ -50,10 +50,14 @@ dependencies:
 
   cupertino_icons: ^1.0.8
 
+  # DST-correct planning in the user's local zone
+  timezone: ^0.9.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  fake_cloud_firestore: ^3.0.1
   build_runner: ^2.4.11
   riverpod_generator: ^2.4.3
   json_serializable: ^6.8.0
